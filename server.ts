@@ -4,6 +4,7 @@ import * as bodyParser from 'body-parser';
 //import * as reload from 'express-reload';
 
 import CommonRouter from './app/routes/common.route';
+import ApplicationRouter from './app/routes/application.route';
 import ArtifactRouter from './app/routes/artifact.route';
 
 dotenv.config();
@@ -30,6 +31,7 @@ app.get('/', (req, res, next) => {
 });
 
 app.use('/', CommonRouter);
+app.use('/application', ApplicationRouter);
 app.use('/artifact', ArtifactRouter);
 
 //app.use(reload(`${__dirname}/dist/server.js`));
