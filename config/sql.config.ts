@@ -3,21 +3,21 @@ import * as mysql from 'mysql';
 const pool = mysql.createPool({
     connectionLimit: 1000,
 	host: '127.0.0.1',
-	user: 'lightInsurance',
+	user: 'root',
 	password: 'reqhydind123',
 	database: 'light_insurance',
 	multipleStatements: true
 });
 
-export const multiQuery = (sqlQuery, params, callback) => {
+export const multiQuery = (sqlQuery: string, params: any, callback: any) => {
 	var conn = mysql.createConnection({
 		host: '127.0.0.1',
-		user: 'lightInsurance',
+		user: 'root',
 		password: 'reqhydind123',
 		database: 'light_insurance',
 		multipleStatements: true
 	});
-	var q = conn.query(sqlQuery, params, (err, rows) => {
+	var q = conn.query(sqlQuery, params, (err: any, rows: any[]) => {
 		if( err ) {
             console.log(err);
         }
@@ -34,10 +34,10 @@ export const multiQuery = (sqlQuery, params, callback) => {
 @params 		{array} params			query parameters ([[columns], params]) eg., [['name','age'],1]
 @params 		{function} callback		query result callback function
 */
-export const query = (sqlQuery, params, callback) => {
-	pool.getConnection((err,conn) => {
+export const query = (sqlQuery: string, params: any, callback: any) => {
+	pool.getConnection((err: any, conn: any) => {
 			if(!err) {
-				var q = conn.query(sqlQuery, params, (err, rows) => {
+				var q = conn.query(sqlQuery, params, (err: any, rows: any[]) => {
 					callback(err,rows);
 					conn.release();
 				});

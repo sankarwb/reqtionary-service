@@ -4,6 +4,8 @@ import * as bodyParser from 'body-parser';
 //import * as reload from 'express-reload';
 
 import CommonRouter from './app/routes/common.route';
+import EmployeeRouter from './app/routes/employee.route';
+import ProjectRouter from './app/routes/project.route';
 import ApplicationRouter from './app/routes/application.route';
 import ArtifactRouter from './app/routes/artifact.route';
 
@@ -31,8 +33,10 @@ app.get('/', (req, res, next) => {
 });
 
 app.use('/', CommonRouter);
-app.use('/application', ApplicationRouter);
-app.use('/artifact', ArtifactRouter);
+app.use('/employees', EmployeeRouter);
+app.use('/applications', ApplicationRouter);
+app.use('/projects', ProjectRouter);
+app.use('/artifacts', ArtifactRouter);
 
 //app.use(reload(`${__dirname}/dist/server.js`));
 

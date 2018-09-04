@@ -29,20 +29,15 @@ export let deletee = (req: Request, res: Response) => {
   });
 };
 
-export let byUser = (req: Request, res: Response) => {
-  console.log(req);
-  const query = `SELECT * from light_app WHERE id_app IN (SELECT id_app FROM light_role_emp WHERE id_employee=${req.params.userId} AND active=1 AND id_app!=0 ORDER BY id_app)`;
-  //sql.query(query, null, (err: any, rows: any[]) => {
-    res.status(200).json([
-      {
-        id: 16,
-        name: 'WindBricks'
-      },
-      {
-        id: 19,
-        name: 'Functional Test'
-      }
-    ]);
-  //});
+export let byId = (req: Request, res: Response) => {
+  res.status(200).json({
+    id: 31,
+    uid: 'A010101',
+    type: 1,
+    firstName: 'Sankara',
+    middleName: 'Swaroop',
+    lastName: 'Asapu',
+    email: 'sankarasapu@gmail.com',
+  });
 };
 
