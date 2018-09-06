@@ -1,6 +1,6 @@
-import * as mysql from 'mysql';
+import {createPool, createConnection} from 'mysql';
 
-const pool = mysql.createPool({
+const pool = createPool({
     connectionLimit: 1000,
 	host: '127.0.0.1',
 	user: 'root',
@@ -10,7 +10,7 @@ const pool = mysql.createPool({
 });
 
 export const multiQuery = (sqlQuery: string, params: any, callback: any) => {
-	var conn = mysql.createConnection({
+	var conn = createConnection({
 		host: '127.0.0.1',
 		user: 'root',
 		password: 'reqhydind123',

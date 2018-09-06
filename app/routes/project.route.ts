@@ -7,6 +7,6 @@ router.get('/list', list);
 router.get('/create', create);
 router.get('/edit/:id', edit);
 router.get('/delete/:id', deletee);
-router.get('/byApplication/:applicationId', byApplication);
+router.get('/byApplication/:userId/:applicationId', byApplication);
 
 export default router;
