@@ -7,6 +7,7 @@ import CommonRouter from './app/routes/common.route';
 import EmployeeRouter from './app/routes/employee.route';
 import ProjectRouter from './app/routes/project.route';
 import ApplicationRouter from './app/routes/application.route';
+import RequirementTypeRouter from './app/routes/requirement-type.route';
 import ArtifactRouter from './app/routes/artifact.route';
 
 dotenv.config();
@@ -36,6 +37,7 @@ app.use('/', CommonRouter);
 app.use('/employees', EmployeeRouter);
 app.use('/applications', ApplicationRouter);
 app.use('/projects', ProjectRouter);
+app.use('/requirementtype', RequirementTypeRouter);
 app.use('/artifacts', ArtifactRouter);
 
 //app.use(reload(`${__dirname}/dist/server.js`));

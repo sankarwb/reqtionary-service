@@ -32,7 +32,7 @@ export let deletee = (req: Request, res: Response) => {
 };
 
 export let byApplication = (req: Request, res: Response) => {
-  const sql = `select LPR.id_release, name_release, LP.id_project, LP.name_project, LP.active_project from light_project_release LPR LEFT JOIN light_project LP ON LPR.id_release=LP.id_release LEFT JOIN light_role_emp LRE ON LP.id_project=LRE.id_project WHERE LPR.active_release=1 AND LP.id_app=${req.params.applicationId} AND id_employee=${req.params.userId} ORDER BY LPR.id_release,LP.id_project;`;
+  const sql = `SELECT LPR.id_release, name_release, LP.id_project, LP.name_project, LP.active_project FROM light_project_release LPR LEFT JOIN light_project LP ON LPR.id_release=LP.id_release LEFT JOIN light_role_emp LRE ON LP.id_project=LRE.id_project WHERE LPR.active_release=1 AND LP.id_app=${req.params.applicationId} AND id_employee=${req.params.userId} ORDER BY LPR.id_release,LP.id_project;`;
   query(sql, null, (err: any, rows: any[]) => {
     if (err) {
       console.log(err);

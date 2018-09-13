@@ -43,7 +43,7 @@ export let byUser = (req: Request, res: Response) => {
       application.id = app['id_app'];
       application.name = app['name_app'];
       applications.push(application);
-    })
+    });
     res.status(200).json(applications);
   });
 };
