@@ -1,12 +1,11 @@
 import { Router } from 'express';
-import {list, create, edit, deletee, byApplication} from '../controllers/project.controller';
+import { Request, Response } from 'express';
+import {byUserAndApplication} from '../controllers/project.controller';
 
-let router = Router();
+const router = Router();
 
-router.get('/list', list);
-router.get('/create', create);
-router.get('/edit/:id', edit);
-router.get('/delete/:id', deletee);
-router.get('/byApplication/:userId/:applicationId', byApplication);
+router.get('/byApplication/:userId/:applicationId', (req: Request, res: Response, next: any) => {
+    byUserAndApplication(req.params).subscribe(response => res.status(200).json(response),err => next(err));
+});
 
 export default router;

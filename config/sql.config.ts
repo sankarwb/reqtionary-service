@@ -1,50 +1,62 @@
 import {createPool, createConnection} from 'mysql';
+import {Observable} from 'rxjs';
 
 const pool = createPool({
     connectionLimit: 1000,
 	host: '127.0.0.1',
 	user: 'root',
-	password: 'reqhydind123',
+	password: 'Sowjanya$123',
 	database: 'light_insurance',
 	multipleStatements: true
 });
 
 export const multiQuery = (sqlQuery: string, params: any, callback: any) => {
-	var conn = createConnection({
+	const conn = createConnection({
 		host: '127.0.0.1',
 		user: 'root',
-		password: 'reqhydind123',
+		password: 'Sowjanya$123',
 		database: 'light_insurance',
 		multipleStatements: true
 	});
-	var q = conn.query(sqlQuery, params, (err: any, rows: any[]) => {
-		if( err ) {
-            console.log(err);
-        }
-		callback(err,rows);
-		//conn.release();
+	return new Observable(observer => {
+		const q = conn.query(sqlQuery, params, (err: any, rows: any[]) => {
+			if(err) {
+				observer.error(err);
+			} else {
+				observer.next(rows);
+			}
+			observer.complete();
+			//conn.release();
+		});
+		console.log(q.sql);
+		console.log("---------------------------------------------------------------------------------------------------------------------");
 	});
-	console.log(q.sql);
-	console.log("---------------------------------------------------------------------------------------------------------------------");
 };
 
 /*
 @description	Method to execute query and callback
 @params 		{string} sqlQuery		An sql string
 @params 		{array} params			query parameters ([[columns], params]) eg., [['name','age'],1]
-@params 		{function} callback		query result callback function
 */
-export const query = (sqlQuery: string, params: any, callback: any) => {
-	pool.getConnection((err: any, conn: any) => {
-			if(!err) {
-				var q = conn.query(sqlQuery, params, (err: any, rows: any[]) => {
-					callback(err,rows);
-					conn.release();
-				});
-				console.log(q.sql);
-				console.log("---------------------------------------------------------------------------------------------------------------------");
+export const query = (sqlQuery: string, params: any) => {
+	return new Observable(observer => {
+		pool.getConnection((err: any, conn: any) => {
+			if(err) {
+				observer.error(err);
+				observer.complete();
 			} else {
-				console.log(err);
+				const q = conn.query(sqlQuery, params, (err: any, rows: any[]) => {
+					if (err) {
+						observer.error(err);
+					} else {
+						observer.next(rows);
+					}
+					conn.release();
+					observer.complete();
+				});
+				console.log("---------------------------------------------------------------------------------------------------------------------");
+				console.log(q.sql);
 			}
 		});
+	})
 };

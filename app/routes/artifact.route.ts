@@ -1,12 +1,37 @@
-import { Router } from 'express';
-import {list, create, edit, deletee, parentArtifactsByApplication} from '../controllers/artifact.controller';
+import {Router, Request, Response} from 'express';
+import {artifacts, parentArtifactsByApplication} from '../controllers/artifact.controller';
 
-let router = Router();
+const router = Router();
 
-router.get('/list', list);
-router.get('/create', create);
-router.get('/edit/:id', edit);
-router.get('/delete/:id', deletee);
-router.get('/parent/byApplication/:applicationId', parentArtifactsByApplication);
+router.get('/parent/byApplication/:applicationId', (req: Request, res: Response, next: any) => {
+    parentArtifactsByApplication(req.params).subscribe(
+        response => res.status(200).json(response),
+        err => next(err)
+    )
+});
+router.get('/:applicationId/:projectId', (req: Request, res: Response, next: any) => {
+    artifacts(req.params).subscribe(
+        response => res.status(200).json(response),
+        err => next(err)
+    )
+});
+router.get('/:applicationId/:projectId/:parentArtifactId', (req: Request, res: Response, next: any) => {
+    artifacts(req.params).subscribe(
+        response => res.status(200).json(response),
+        err => next(err)
+    )
+});
+router.get('/:applicationId/:projectId/:assignedTo', (req: Request, res: Response, next: any) => {
+    artifacts(req.params).subscribe(
+        response => res.status(200).json(response),
+        err => next(err)
+    )
+});
+router.get('/:applicationId/:projectId/:parentArtifactId/:assignedTo', (req: Request, res: Response, next: any) => {
+    artifacts(req.params).subscribe(
+        response => res.status(200).json(response),
+        err => next(err)
+    )
+});
 
 export default router;

@@ -1,5 +1,6 @@
 export class Base {
     id: number;
+    orgId: number;
     name: string;
     description: string;
     private _active: boolean;

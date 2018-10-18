@@ -5,13 +5,7 @@ export class Project extends Base {
     statusId: number;
     releaseId: number;
     pcode: string;
-    private _type: boolean;
-    set type(value: boolean|number) {
-        this._type = !!value;
-    }
-    get type(): boolean|number {
-        return this._type;
-    }
+    type: number;
     productionDate: Date;
     startDate: Date;
     endDate: Date;

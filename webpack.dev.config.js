@@ -1,33 +1,8 @@
-/* var path = require('path'),
-    fs = require('fs'),
-    nodeModules = {};
-
-fs.readdirSync('node_modules')
-.filter(function (x) {
-    return ['.bin'].indexOf(x) === -1;
-})
-.forEach(function(mod) {
-    nodeModules[mod] = 'commonjs ' + mod;
-});
-
-module.exports = {
-    entry: './server.ts',
-    output: {
-        filename: 'server.js',
-        path: path.resolve(__dirname, 'dist')
-    },
-    module: {
-        rules: [
-            { test: /\.ts$/, loader: 'ts-loader' }
-        ]
-    },
-    target: 'node',
-    externals: nodeModules
-}; */
 const path = require('path');
 module.exports = {
     entry: `./server.ts`,
     target: 'node',
+    mode: 'development',
     externals: [
         /^[a-z\-0-9]+$/ // Ignore node_modules folder
     ],

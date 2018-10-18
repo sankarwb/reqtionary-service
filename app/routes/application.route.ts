@@ -1,12 +1,11 @@
-import { Router } from 'express';
-import {list, create, edit, deletee, byUser} from '../controllers/application.controller';
+import {Router} from 'express';
+import {Request, Response} from 'express';
+import {byUser} from '../controllers/application.controller';
 
-let router = Router();
+const router = Router();
 
-router.get('/list', list);
-router.get('/create', create);
-router.get('/edit/:id', edit);
-router.get('/delete/:id', deletee);
-router.get('/byUser/:userId', byUser);
+router.get('/byUser/:userId', (req: Request, res: Response, next: any) => {
+    byUser(req.params).subscribe(response => res.status(200).json(response),err => next(err));
+});
 
 export default router;
