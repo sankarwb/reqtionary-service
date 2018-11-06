@@ -60,3 +60,24 @@ export const query = (sqlQuery: string, params: any) => {
 		});
 	})
 };
+
+export const queryAsync = async (sqlQuery: string, params: any) => {
+	pool.getConnection((err: any, conn: any) => {
+		if(err) {
+			throw err;
+		} else {
+			const q = conn.query(sqlQuery, params, (err: any, rows: any[]) => {
+				if (err) {
+					console.log(err);
+					throw err;
+				} else {
+					console.log(rows);
+					return rows;
+				}
+				conn.release();
+			});
+			console.log("---------------------------------------------------------------------------------------------------------------------");
+			console.log(q.sql);
+		}
+	});
+};

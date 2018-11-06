@@ -3,7 +3,7 @@ import {byId, byApplication} from '../controllers/employee.controller';
 
 let router = Router();
 
-router.get('/:id', (req: Request, res: Response, next: any) => {
+router.get('/:employeeId', (req: Request, res: Response, next: any) => {
     byId(req.params).subscribe(response => res.status(200).json(response), err => next(err));
 });
 

@@ -9,4 +9,6 @@ export class Project extends Base {
     productionDate: Date;
     startDate: Date;
     endDate: Date;
+    expected: number;
+    actual: number;
 }

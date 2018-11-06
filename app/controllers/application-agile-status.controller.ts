@@ -4,8 +4,9 @@ import {ApplicationAgileStatus} from '../models/application-agile-status';
 
 export const byApplication = (req: {applicationId: number}) => {
   return new Observable<ApplicationAgileStatus[]>(observer => {
-    const sql = `SELECT id_app_agile_status, agile_status_value FROM light_app_agile_status WHERE id_app=${req.applicationId} AND active=1 ORDER BY order_status_value;`;
-    query(sql, null).subscribe((rows: any[]) => {
+    const columns = ['id_app_agile_status', 'agile_status_value'],
+          sql = `SELECT ?? FROM light_app_agile_status WHERE id_app=? AND active=1 ORDER BY order_status_value;`;
+    query(sql, [columns, req.applicationId]).subscribe((rows: any[]) => {
       let status: ApplicationAgileStatus, statuses: ApplicationAgileStatus[] = [];
       rows.forEach(row => {
         status = new ApplicationAgileStatus();

@@ -4,8 +4,9 @@ import {Observable} from 'rxjs';
 
 export const byApplication = (req: {applicationId: number}) => {
   return new Observable<Artifact[]>(observer => {
-    const sql = `SELECT id_artifact, name_artifact FROM light_artifact_history WHERE id_app=${req.applicationId} ORDER BY modified_date DESC LIMIT 10;`;
-    query(sql, null).subscribe((rows: any[]) => {
+    const columns = ['id_artifact', 'name_artifact'],
+          sql = `SELECT ?? FROM light_artifact_history WHERE id_app=? ORDER BY modified_date DESC LIMIT 10;`;
+    query(sql, [columns, req.applicationId]).subscribe((rows: any[]) => {
         let artifact: Artifact, artifacts: Artifact[]=[];
         rows.forEach(row => {
           artifact = new Artifact();

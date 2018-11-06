@@ -1,37 +1,67 @@
 import {Router, Request, Response} from 'express';
-import {artifacts, parentArtifactsByApplication} from '../controllers/artifact.controller';
+import {artifacts, parentArtifacts} from '../controllers/artifact.controller';
 
 const router = Router();
 
-router.get('/parent/byApplication/:applicationId', (req: Request, res: Response, next: any) => {
-    parentArtifactsByApplication(req.params).subscribe(
+router.get('/parent-artifacts/byApplication/:applicationId', (req: Request, res: Response, next: any) => {
+    parentArtifacts(req.params).subscribe(
         response => res.status(200).json(response),
         err => next(err)
-    )
+    );
 });
-router.get('/:applicationId/:projectId', (req: Request, res: Response, next: any) => {
+
+/******************************** Agile Artifacts ****************************************/
+
+router.get('/agile-artifacts/:applicationId/:projectId/:requirementTypeId', (req: Request, res: Response, next: any) => {
+    artifacts(req.params, true).subscribe(
+        response => res.status(200).json(response),
+        err => next(err)
+    );
+});
+router.get('/agile-artifacts/:applicationId/:projectId/:requirementTypeId/:parentArtifactId', (req: Request, res: Response, next: any) => {
+    artifacts(req.params, true).subscribe(
+        response => res.status(200).json(response),
+        err => next(err)
+    );
+});
+router.get('/agile-artifacts/:applicationId/:projectId/:requirementTypeId/:assignedTo', (req: Request, res: Response, next: any) => {
+    artifacts(req.params, true).subscribe(
+        response => res.status(200).json(response),
+        err => next(err)
+    );
+});
+router.get('/agile-artifacts/:applicationId/:projectId/:requirementTypeId/:parentArtifactId/:assignedTo', (req: Request, res: Response, next: any) => {
+    artifacts(req.params, true).subscribe(
+        response => res.status(200).json(response),
+        err => next(err)
+    );
+});
+
+/******************************** List Artifacts ****************************************/
+
+router.get('/:applicationId/:projectId/:requirementTypeId', (req: Request, res: Response, next: any) => {
     artifacts(req.params).subscribe(
         response => res.status(200).json(response),
         err => next(err)
-    )
+    );
 });
-router.get('/:applicationId/:projectId/:parentArtifactId', (req: Request, res: Response, next: any) => {
+router.get('/:applicationId/:projectId/:requirementTypeId/:parentArtifactId', (req: Request, res: Response, next: any) => {
     artifacts(req.params).subscribe(
         response => res.status(200).json(response),
         err => next(err)
-    )
+    );
 });
-router.get('/:applicationId/:projectId/:assignedTo', (req: Request, res: Response, next: any) => {
+router.get('/:applicationId/:projectId/:requirementTypeId/:assignedTo', (req: Request, res: Response, next: any) => {
     artifacts(req.params).subscribe(
         response => res.status(200).json(response),
         err => next(err)
-    )
+    );
 });
-router.get('/:applicationId/:projectId/:parentArtifactId/:assignedTo', (req: Request, res: Response, next: any) => {
+router.get('/:applicationId/:projectId/:requirementTypeId/:parentArtifactId/:assignedTo', (req: Request, res: Response, next: any) => {
     artifacts(req.params).subscribe(
         response => res.status(200).json(response),
         err => next(err)
-    )
+    );
 });
 
 export default router;
