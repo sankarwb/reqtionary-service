@@ -7,7 +7,7 @@ export const print = (path: any, layer: any) => {
         layer.handle.stack.forEach(print.bind(null, path.concat(split(layer.regexp))))
     } else if (layer.method) {
         const route = path.concat(split(layer.regexp)).filter(Boolean).join('/');
-        paths += `<li>${layer.method.toUpperCase()}: <a href="http://localhost:3000/${route}" target="_blank">/${route}</a></li>`;
+        paths += `<li>${layer.method.toUpperCase()}: <a href="http://localhost:${process.env.PORT || 3000}/${route}" target="_blank">/${route}</a></li>`;
     }
 }
 

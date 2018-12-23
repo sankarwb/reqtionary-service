@@ -1,5 +1,5 @@
 import {Router, Request, Response} from 'express';
-import {artifacts, parentArtifacts} from '../controllers/artifact.controller';
+import {artifacts, parentArtifacts, artifactById} from '../controllers/artifact.controller';
 
 const router = Router();
 
@@ -59,6 +59,12 @@ router.get('/:applicationId/:projectId/:requirementTypeId/:assignedTo', (req: Re
 });
 router.get('/:applicationId/:projectId/:requirementTypeId/:parentArtifactId/:assignedTo', (req: Request, res: Response, next: any) => {
     artifacts(req.params).subscribe(
+        response => res.status(200).json(response),
+        err => next(err)
+    );
+});
+router.get('/:artifactId', (req: Request, res: Response, next: any) => {
+    artifactById(req.params).subscribe(
         response => res.status(200).json(response),
         err => next(err)
     );
