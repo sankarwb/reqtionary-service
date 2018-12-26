@@ -5,4 +5,5 @@ export class Attribute extends Base {
     type: string;
     system: number;
     status: number;
+    values: string[];
 }
