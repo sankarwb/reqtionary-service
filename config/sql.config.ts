@@ -5,7 +5,7 @@ const pool = createPool({
     connectionLimit: 1000,
 	host: '127.0.0.1',
 	user: 'root',
-	password: 'Sowjanya$123',
+	password: 'reqhydind123',
 	database: 'light_insurance',
 	multipleStatements: true
 });
@@ -14,7 +14,7 @@ export const multiQuery = (sqlQuery: string, params: any, callback: any) => {
 	const conn = createConnection({
 		host: '127.0.0.1',
 		user: 'root',
-		password: 'Sowjanya$123',
+		password: 'reqhydind123',
 		database: 'light_insurance',
 		multipleStatements: true
 	});
