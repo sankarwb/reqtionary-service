@@ -15,6 +15,7 @@ import AttributeRouter from './app/routes/attribute.route';
 import ArtifactRouter from './app/routes/artifact.route';
 import AppAgileStatusRouter from './app/routes/application-agile-status.route';
 import ArtifactHistoryRouter from './app/routes/artifact-history.route';
+import FileUpload from './app/routes/file-upload.route';
 
 const app = express();
 
@@ -23,8 +24,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  res.header('Access-Control-Allow-Origin', 'http://107.170.228.97');
+  res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, application/json, Origin, X-Requested-With, Accept, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
   next();
 });
 
@@ -47,6 +50,8 @@ app.use('/attribute', AttributeRouter);
 app.use('/application-agile-status', AppAgileStatusRouter);
 app.use('/artifacts', ArtifactRouter);
 app.use('/artifact-history', ArtifactHistoryRouter);
+app.use('/', FileUpload);
+
 app.route('/routes').get((req, res, next) => {
   app._router.stack.forEach(print.bind(null, []));
   res.status(200).send(getPaths());
