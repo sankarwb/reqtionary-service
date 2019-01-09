@@ -83,7 +83,7 @@ app.use((err: any, req: any, res: any, next: any) => {
 
 //app.use(reload(`${__dirname}/dist/server.js`));
 
-app.listen(app.get('port'), () => {
+app.listen(3000, () => {
   console.log(('App is running at http://localhost:%d in %s mode'),
   app.get('port'), app.get('env'));
 });

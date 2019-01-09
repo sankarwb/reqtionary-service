@@ -170,6 +170,18 @@ eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nvar rx
 
 /***/ }),
 
+/***/ "./app/controllers/file-upload.controller.ts":
+/*!***************************************************!*\
+  !*** ./app/controllers/file-upload.controller.ts ***!
+  \***************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nvar rxjs_1 = __webpack_require__(/*! rxjs */ \"rxjs\");\nvar multer = __webpack_require__(/*! multer */ \"multer\");\nvar storage = multer.diskStorage({\n    destination: function (req, file, cb) {\n        cb(null, './uploads/');\n    },\n    filename: function (req, file, cb) {\n        var timestamp = Date.now();\n        cb(null, file.originalname);\n    }\n}), upload = multer({ storage: storage }).single('file');\nexports.fileUpload = function (req, res) {\n    return new rxjs_1.Observable(function (observer) {\n        upload(req, res, function (err) {\n            if (err) {\n                observer.error(err);\n            }\n            else {\n                observer.next(req.file.filename);\n            }\n            observer.complete();\n        });\n    });\n};\n\n\n//# sourceURL=webpack:///./app/controllers/file-upload.controller.ts?");
+
+/***/ }),
+
 /***/ "./app/controllers/project.controller.ts":
 /*!***********************************************!*\
   !*** ./app/controllers/project.controller.ts ***!
@@ -398,6 +410,18 @@ eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nvar ex
 
 /***/ }),
 
+/***/ "./app/routes/file-upload.route.ts":
+/*!*****************************************!*\
+  !*** ./app/routes/file-upload.route.ts ***!
+  \*****************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nvar express_1 = __webpack_require__(/*! express */ \"express\");\nvar file_upload_controller_1 = __webpack_require__(/*! ../controllers/file-upload.controller */ \"./app/controllers/file-upload.controller.ts\");\nvar router = express_1.Router();\nrouter.post('/fileupload', function (req, res, next) {\n    file_upload_controller_1.fileUpload(req, res).subscribe(function (response) { return res.status(200).json(response); }, function (err) { return next(err); });\n});\nexports.default = router;\n\n\n//# sourceURL=webpack:///./app/routes/file-upload.route.ts?");
+
+/***/ }),
+
 /***/ "./app/routes/project.route.ts":
 /*!*************************************!*\
   !*** ./app/routes/project.route.ts ***!
@@ -466,7 +490,7 @@ eval("\nvar __awaiter = (this && this.__awaiter) || function (thisArg, _argument
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nvar express = __webpack_require__(/*! express */ \"express\");\nvar bodyParser = __webpack_require__(/*! body-parser */ \"body-parser\");\nvar cookieParser = __webpack_require__(/*! cookie-parser */ \"cookie-parser\");\nvar tokenization_1 = __webpack_require__(/*! ./app/utils/tokenization */ \"./app/utils/tokenization.ts\");\nvar app_routes_1 = __webpack_require__(/*! ./app/middleware/app-routes */ \"./app/middleware/app-routes.ts\");\nvar auth_route_1 = __webpack_require__(/*! ./app/routes/auth.route */ \"./app/routes/auth.route.ts\");\nvar employee_route_1 = __webpack_require__(/*! ./app/routes/employee.route */ \"./app/routes/employee.route.ts\");\nvar project_route_1 = __webpack_require__(/*! ./app/routes/project.route */ \"./app/routes/project.route.ts\");\nvar application_route_1 = __webpack_require__(/*! ./app/routes/application.route */ \"./app/routes/application.route.ts\");\nvar requirement_type_route_1 = __webpack_require__(/*! ./app/routes/requirement-type.route */ \"./app/routes/requirement-type.route.ts\");\nvar attribute_route_1 = __webpack_require__(/*! ./app/routes/attribute.route */ \"./app/routes/attribute.route.ts\");\nvar artifact_route_1 = __webpack_require__(/*! ./app/routes/artifact.route */ \"./app/routes/artifact.route.ts\");\nvar application_agile_status_route_1 = __webpack_require__(/*! ./app/routes/application-agile-status.route */ \"./app/routes/application-agile-status.route.ts\");\nvar artifact_history_route_1 = __webpack_require__(/*! ./app/routes/artifact-history.route */ \"./app/routes/artifact-history.route.ts\");\nvar app = express();\napp.set('port', process.env.PORT || 3000);\napp.use(bodyParser.json());\napp.use(bodyParser.urlencoded({ extended: true }));\napp.use(function (req, res, next) {\n    res.header(\"Access-Control-Allow-Origin\", \"*\");\n    res.header(\"Access-Control-Allow-Headers\", \"Origin, X-Requested-With, Content-Type, Accept, Authorization\");\n    next();\n});\napp.route('/').get(tokenization_1.valid, function (req, res, next) {\n    var token = req.get('token');\n    if (!token) {\n        res.status(401).json('un authorized');\n    }\n    else {\n        next();\n    }\n});\napp.use('/', auth_route_1.default);\napp.use('/employees', employee_route_1.default);\napp.use('/applications', application_route_1.default);\napp.use('/projects', project_route_1.default);\napp.use('/requirement-type', requirement_type_route_1.default);\napp.use('/attribute', attribute_route_1.default);\napp.use('/application-agile-status', application_agile_status_route_1.default);\napp.use('/artifacts', artifact_route_1.default);\napp.use('/artifact-history', artifact_history_route_1.default);\napp.route('/routes').get(function (req, res, next) {\n    app._router.stack.forEach(app_routes_1.print.bind(null, []));\n    res.status(200).send(app_routes_1.getPaths());\n});\napp.use(function (err, req, res, next) {\n    if (err.sqlMessage) {\n        console.error(err.sqlMessage);\n    }\n    next(err);\n});\napp.use(function (err, req, res, next) {\n    console.error(err.stack);\n    next(err);\n});\napp.use(function (err, req, res, next) {\n    if (err.name === 'UnauthorizedError') {\n        res.status(401).send('Un Authorized');\n    }\n    res.status(500).send('Something went wrong');\n});\napp.listen(app.get('port'), function () {\n    console.log(('App is running at http://localhost:%d in %s mode'), app.get('port'), app.get('env'));\n});\nmodule.exports = app;\n\n\n//# sourceURL=webpack:///./server.ts?");
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nvar express = __webpack_require__(/*! express */ \"express\");\nvar bodyParser = __webpack_require__(/*! body-parser */ \"body-parser\");\nvar cookieParser = __webpack_require__(/*! cookie-parser */ \"cookie-parser\");\nvar tokenization_1 = __webpack_require__(/*! ./app/utils/tokenization */ \"./app/utils/tokenization.ts\");\nvar app_routes_1 = __webpack_require__(/*! ./app/middleware/app-routes */ \"./app/middleware/app-routes.ts\");\nvar auth_route_1 = __webpack_require__(/*! ./app/routes/auth.route */ \"./app/routes/auth.route.ts\");\nvar employee_route_1 = __webpack_require__(/*! ./app/routes/employee.route */ \"./app/routes/employee.route.ts\");\nvar project_route_1 = __webpack_require__(/*! ./app/routes/project.route */ \"./app/routes/project.route.ts\");\nvar application_route_1 = __webpack_require__(/*! ./app/routes/application.route */ \"./app/routes/application.route.ts\");\nvar requirement_type_route_1 = __webpack_require__(/*! ./app/routes/requirement-type.route */ \"./app/routes/requirement-type.route.ts\");\nvar attribute_route_1 = __webpack_require__(/*! ./app/routes/attribute.route */ \"./app/routes/attribute.route.ts\");\nvar artifact_route_1 = __webpack_require__(/*! ./app/routes/artifact.route */ \"./app/routes/artifact.route.ts\");\nvar application_agile_status_route_1 = __webpack_require__(/*! ./app/routes/application-agile-status.route */ \"./app/routes/application-agile-status.route.ts\");\nvar artifact_history_route_1 = __webpack_require__(/*! ./app/routes/artifact-history.route */ \"./app/routes/artifact-history.route.ts\");\nvar file_upload_route_1 = __webpack_require__(/*! ./app/routes/file-upload.route */ \"./app/routes/file-upload.route.ts\");\nvar app = express();\napp.set('port', process.env.PORT || 3000);\napp.use(bodyParser.json());\napp.use(bodyParser.urlencoded({ extended: true }));\napp.use(function (req, res, next) {\n    res.header('Access-Control-Allow-Origin', 'http://localhost:4200');\n    res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');\n    res.header('Access-Control-Allow-Headers', 'Content-Type, application/json, Origin, X-Requested-With, Accept, Authorization');\n    res.header('Access-Control-Allow-Credentials', 'true');\n    next();\n});\napp.route('/').get(tokenization_1.valid, function (req, res, next) {\n    var token = req.get('token');\n    if (!token) {\n        res.status(401).json('un authorized');\n    }\n    else {\n        next();\n    }\n});\napp.use('/', auth_route_1.default);\napp.use('/employees', employee_route_1.default);\napp.use('/applications', application_route_1.default);\napp.use('/projects', project_route_1.default);\napp.use('/requirement-type', requirement_type_route_1.default);\napp.use('/attribute', attribute_route_1.default);\napp.use('/application-agile-status', application_agile_status_route_1.default);\napp.use('/artifacts', artifact_route_1.default);\napp.use('/artifact-history', artifact_history_route_1.default);\napp.use('/', file_upload_route_1.default);\napp.route('/routes').get(function (req, res, next) {\n    app._router.stack.forEach(app_routes_1.print.bind(null, []));\n    res.status(200).send(app_routes_1.getPaths());\n});\napp.use(function (err, req, res, next) {\n    if (err.sqlMessage) {\n        console.error(err.sqlMessage);\n    }\n    next(err);\n});\napp.use(function (err, req, res, next) {\n    console.error(err.stack);\n    next(err);\n});\napp.use(function (err, req, res, next) {\n    if (err.name === 'UnauthorizedError') {\n        res.status(401).send('Un Authorized');\n    }\n    res.status(500).send('Something went wrong');\n});\napp.listen(app.get('port'), function () {\n    console.log(('App is running at http://localhost:%d in %s mode'), app.get('port'), app.get('env'));\n});\nmodule.exports = app;\n\n\n//# sourceURL=webpack:///./server.ts?");
 
 /***/ }),
 
@@ -522,6 +546,17 @@ eval("module.exports = require(\"express-jwt\");\n\n//# sourceURL=webpack:///ext
 /***/ (function(module, exports) {
 
 eval("module.exports = require(\"jsonwebtoken\");\n\n//# sourceURL=webpack:///external_%22jsonwebtoken%22?");
+
+/***/ }),
+
+/***/ "multer":
+/*!*************************!*\
+  !*** external "multer" ***!
+  \*************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("module.exports = require(\"multer\");\n\n//# sourceURL=webpack:///external_%22multer%22?");
 
 /***/ }),
 
