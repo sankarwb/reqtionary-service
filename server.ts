@@ -1,6 +1,8 @@
 import * as express from 'express';
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+require('dotenv').config();
+
 import {valid} from './app/utils/tokenization';
 //import * as reload from 'express-reload';
 
@@ -19,10 +21,15 @@ import FileUpload from './app/routes/file-upload.route';
 
 const app = express();
 
-app.set('port', process.env.PORT || 3000);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+/* app.configure('development', () => {
+  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+})
 
+app.configure('production', () => {
+  app.use(express.errorHandler())
+}) */
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', 'http://107.170.228.97');
   res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
@@ -82,10 +89,10 @@ app.use((err: any, req: any, res: any, next: any) => {
 });
 
 //app.use(reload(`${__dirname}/dist/server.js`));
-
-app.listen(3000, () => {
-  console.log(('App is running at http://localhost:%d in %s mode'),
-  app.get('port'), app.get('env'));
+console.log('MySQL User: ',process.env.MYSQL_USER);
+app.listen(process.env.PORT || 3000, () => {
+  console.log('App is running at http://localhost:%d in %s mode',
+  process.env.PORT, process.env.NODE_ENV);
 });
 
 module.exports = app;

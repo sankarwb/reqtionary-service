@@ -3,11 +3,16 @@
   "version": "1.0.0",
   "description": "A reqtionary service",
   "main": "./dist/server",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack --config webpack.dev.config.js && node ./dist/server.js",
+    "prod": "webpack --config webpack.prod.config.js && node ./dist/server.js"
+  },
   "dependencies": {
     "body-parser": "^1.18.3",
     "cookie-parser": "^1.4.3",
     "date-fns": "^1.29.0",
-    "dotenv": "^6.0.0",
+    "dotenv": "^6.2.0",
     "express": "^4.16.3",
     "express-jwt": "^5.3.1",
     "jsonwebtoken": "^8.3.0",
@@ -30,10 +35,6 @@
     "typescript": "^3.0.1",
     "webpack": "^4.17.1",
     "webpack-cli": "^3.1.0"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack --config webpack.dev.config.js && PORT=3000 node ./dist/server.js"
   },
   "repository": {
     "type": "git",

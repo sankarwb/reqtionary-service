@@ -4,7 +4,7 @@ module.exports = {
     target: 'node',
     mode: 'production',
     externals: [
-        /^[a-z\-0-9]+$/ // Ignore node_modules folder
+        /^[a-z\-0-9]+$/
     ],
     output: {
         filename: 'server.js',
@@ -12,17 +12,13 @@ module.exports = {
         libraryTarget: "commonjs"
     },
     resolve: {
-        // Add in `.ts` and `.tsx` as a resolvable extension.
         extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js'],
-        modules: [
-            `./node_modules`,
-            'node_modules'
-        ]
-    },
-    resolveLoader: {
-        //root: [`${root}/node_modules`],
+        modules: [`./node_modules`,'node_modules']
     },
     module: {
-        rules: [{test: /\.ts$/, use: 'ts-loader'}]
+        rules: [{
+            test: /\.ts?$/,
+            use: [{loader: 'ts-loader'}]
+        }]
     }
 };
