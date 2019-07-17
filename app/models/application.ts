@@ -1,8 +1,8 @@
-import { Base } from './base.model';
+import { Base } from "./base.model";
 
 export class Application extends Base {
-    orgId: number;
-    divId: number;
-    appGroupId: number;
-    comments: string;
+    public orgId: number;
+    public divId: number;
+    public appGroupId: number;
+    public comments: string;
 }

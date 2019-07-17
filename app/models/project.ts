@@ -1,14 +1,14 @@
-import { Base } from './base.model';
+import { Base } from "./base.model";
 
 export class Project extends Base {
-    appId: number;
-    statusId: number;
-    releaseId: number;
-    pcode: string;
-    type: number;
-    productionDate: Date;
-    startDate: Date;
-    endDate: Date;
-    expected: number;
-    actual: number;
+    public appId: number;
+    public statusId: number;
+    public releaseId: number;
+    public pcode: string;
+    public type: number;
+    public productionDate: Date;
+    public startDate: Date;
+    public endDate: Date;
+    public expected: number;
+    public actual: number;
 }

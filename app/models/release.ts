@@ -1,6 +1,6 @@
-import { Project } from './project';
+import { Project } from "./project";
 
 export class Release extends Project {
-    type: number;
-    projects: Project[];
+    public type: number;
+    public projects: Project[];
 }

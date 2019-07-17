@@ -1,7 +1,7 @@
 import {Base} from "./base.model";
 
 export class ApplicationAgileStatus extends Base {
-    id: number;
-    statusText: string;
-    order: number;
+    public id: number;
+    public statusText: string;
+    public order: number;
 }

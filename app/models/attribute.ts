@@ -1,9 +1,10 @@
-import { Base } from './base.model';
+import { Base } from "./base.model";
 
 export class Attribute extends Base {
-    value: string;
-    type: string;
-    system: number;
-    status: number;
-    values: string[];
+    public appObjectAttributeId: number;
+    public value: string;
+    public type: string;
+    public system: number;
+    public status: number;
+    public values: string[];
 }

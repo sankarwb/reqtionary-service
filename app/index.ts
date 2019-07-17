@@ -1,25 +1,32 @@
-import * as express from 'express';
+import express from 'express';
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
-import {valid} from './app/utils/tokenization';
+import {valid} from './utils/tokenization';
 //import * as reload from 'express-reload';
 
-import {print, getPaths} from './app/middleware/app-routes';
+import {print, getPaths} from './middleware/app-routes';
 
-import AuthRouter from './app/routes/auth.route';
-import EmployeeRouter from './app/routes/employee.route';
-import ProjectRouter from './app/routes/project.route';
-import ApplicationRouter from './app/routes/application.route';
-import RequirementTypeRouter from './app/routes/requirement-type.route';
-import AttributeRouter from './app/routes/attribute.route';
-import ArtifactRouter from './app/routes/artifact.route';
-import AppAgileStatusRouter from './app/routes/application-agile-status.route';
-import ArtifactHistoryRouter from './app/routes/artifact-history.route';
-import FileUpload from './app/routes/file-upload.route';
+import AuthRouter from './routes/auth.route';
+import EmployeeRouter from './routes/employee.route';
+import ProjectRouter from './routes/project.route';
+import ApplicationRouter from './routes/application.route';
+import RequirementTypeRouter from './routes/requirement-type.route';
+import AttributeRouter from './routes/attribute.route';
+import ArtifactRouter from './routes/artifact.route';
+import AppAgileStatusRouter from './routes/application-agile-status.route';
+import ArtifactHistoryRouter from './routes/artifact-history.route';
+import FileUpload from './routes/file-upload.route';
+
+import {attributeDAO} from './controllers/AttributeDAO';
 
 const app = express();
+
+// Old files implementation
+let router = express.Router();
+attributeDAO(router);
+/************ Old implementation end *************/
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -31,7 +38,7 @@ app.configure('production', () => {
   app.use(express.errorHandler())
 }) */
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://107.170.228.97');
+  res.header('Access-Control-Allow-Origin', (process.env.NODE_ENV==='development')?process.env.DEV_ALLOW_ORIGIN:process.env.PROD_ALLOW_ORIGIN);
   res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, application/json, Origin, X-Requested-With, Accept, Authorization');
   res.header('Access-Control-Allow-Credentials', 'true');

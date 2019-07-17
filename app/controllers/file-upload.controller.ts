@@ -1,20 +1,20 @@
-import {Observable} from 'rxjs';
-import * as multer from 'multer';
+import multer from "multer";
+import {Observable} from "rxjs";
 
-let storage = multer.diskStorage({
+const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, './uploads/');
+    cb(null, "./uploads/");
   },
   filename: (req, file, cb) => {
-    let timestamp = Date.now();
+    const timestamp = Date.now();
     cb(null, file.originalname);
   }
 }),
-upload = multer({storage}).single('file');
+upload = multer({storage}).single("file");
 
 export const fileUpload = (req: any, res: any) => {
-  return new Observable(observer => {
-    upload(req, res, (err) => {
+  return new Observable((observer) => {
+    upload(req, res, (err: any) => {
       if (err) {
         observer.error(err);
       } else {
@@ -23,4 +23,4 @@ export const fileUpload = (req: any, res: any) => {
       observer.complete();
     });
   });
-}
+};

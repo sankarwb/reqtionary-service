@@ -2,12 +2,13 @@
   "name": "reqtionary-service",
   "version": "1.0.0",
   "description": "A reqtionary service",
-  "main": "./dist/app/index.js",
+  "main": "./dist/server",
   "scripts": {
-    "build": "tsc",
-    "prestart": "npm run build",
-    "start": "NODE_ENV=development node --inspect ./dist/app/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npm run tsc && node ./dist/server.js",
+    "start1": "webpack --config webpack.dev.config.js && node ./dist/server.js",
+    "debug": "webpack --config webpack.dev.config.js && node --inspect --debug-brk ./dist/server.js",
+    "prod": "webpack --config webpack.prod.config.js && node ./dist/server.js"
   },
   "dependencies": {
     "body-parser": "^1.18.3",

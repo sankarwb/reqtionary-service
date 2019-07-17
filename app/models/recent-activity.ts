@@ -1,3 +1,3 @@
 export class RecentActivity {
-    activity: string;    
+    public activity: string;
 }

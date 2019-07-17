@@ -1,8 +1,8 @@
 import { Base } from "./base.model";
 
 export class Employee extends Base {
-    uid: string;
-    firstName: string;
-    middleName: string;
-    lastName: string;
+    public uid: string;
+    public firstName: string;
+    public middleName: string;
+    public lastName: string;
 }
