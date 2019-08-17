@@ -167,5 +167,3 @@ function projectChildren(children: any,type: any) {
 		})
 	}
 }
-
-module.exports = orgDAO;

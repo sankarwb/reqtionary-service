@@ -63,5 +63,3 @@ function getVendors(req: any){
 		}
 	})
 }
-
-module.exports = vendorDAO;

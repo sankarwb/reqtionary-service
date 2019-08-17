@@ -167,4 +167,3 @@ function getProjectDetails(req: any){
 		}
 	})
 }
-module.exports = {projectDAO, updateProject, getAppProject};

@@ -377,5 +377,3 @@ export const updateObjectAttributes = (orgId: any,objId: any,row: any,modifiedBy
 		}	
 	})
 }
-
-module.exports = {attributeDAO,getObjectAttributes,updateAttribute,updateObjectAttributes,updateAttributeValues};

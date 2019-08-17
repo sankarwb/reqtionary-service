@@ -63,5 +63,3 @@ function getDesignations(req: any){
 		}
 	})
 }
-
-module.exports = designationDAO;

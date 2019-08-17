@@ -62,5 +62,3 @@ function getStatus(req: any){
 		}
 	})
 }
-
-module.exports = statusDAO;

@@ -1,7 +1,7 @@
 import * as sql from '../../config/sqlconfig-old';
 import * as RoleDAO from './RoleDAO';
 
-export const appgrpDAO = function (router: any) {
+export var appgrpDAO = (router: any) => {
 	router.post('/getAppGroups',(req: any,res: any) => {
 		req.body.role = "Application Group";
 		getAppGroups(req).then(results => res.json(results),error => res.json({error:error}));
@@ -80,4 +80,3 @@ function getAppGroups(req: any){
 		}
 	});
 }
-module.exports = appgrpDAO;

@@ -198,7 +198,7 @@ function updateRoleEmployee(req: any){
 				console.log("\nrole failed to update: ",err);
 				reject({error:"role failed to update"});
 			} else if(rows && rows.length > 0){
-				resolve({success:rowData[0]['@status']});
+				resolve({success:rows[0]['@status']});
 			} else {
 				console.log("\nrole failed to update: ",rows);
 				resolve({error:"role failed to update"});
@@ -207,7 +207,7 @@ function updateRoleEmployee(req: any){
 	})
 }
 
-export const getRoleEmpObj = function (rowData: any,key: any,id: any) {
+export const getRoleEmpObj = function (rowData: any,key?: any,id?: any) {
 	let roleEmpVO : any = {
 		roleEmpId: rowData['id_role_emp'],
 		roleId: rowData['id_role'],
@@ -226,4 +226,3 @@ export const getRoleEmpObj = function (rowData: any,key: any,id: any) {
 	roleEmpVO[key] = id;
 	return roleEmpVO;
 }
-module.exports = {roleDAO, getEmpRoles, getRoleEmpObj, updateBulkRoleEmp};

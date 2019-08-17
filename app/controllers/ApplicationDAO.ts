@@ -6,7 +6,7 @@ import * as	ProjectDAO from './ProjectDAO';
 import * as	ArtifactDAO from './ArtifactDAO';
 import * as	AgileDAO from './AgileDAO';
 
-export const appDAO = function (router: any) {
+export const appDAO = (router: any) => {
 	router.post('/getUserApps',function(req: any,res: any){
 		var columns = ['LA.id_app', 'name_app','LP.id_project','name_project','type_project'], 
 		qry = "SELECT ?? FROM light_app LA LEFT JOIN light_project LP ON LA.id_app=LP.id_app WHERE LA.id_app in(SELECT id_app FROM light_role_emp WHERE id_org=? AND id_employee=? AND active=1) AND LA.id_org=? AND active_app=1 ORDER BY LA.id_app;";
@@ -195,5 +195,3 @@ function createSupressedProjects(orgId: any, releaseId: any, appId: any, modifie
 	 		.then( result => resolve(true), err => reject(err));
 	})
 }
-
-module.exports = appDAO;

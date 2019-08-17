@@ -88,4 +88,3 @@ function getDivisions(req: any){
 		}
 	});
 }
-module.exports = divisionDAO;

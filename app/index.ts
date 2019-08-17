@@ -1,4 +1,5 @@
 import express from 'express';
+import { Router } from "express";
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
@@ -19,14 +20,25 @@ import AppAgileStatusRouter from './routes/application-agile-status.route';
 import ArtifactHistoryRouter from './routes/artifact-history.route';
 import FileUpload from './routes/file-upload.route';
 
+import {agileDAO} from './controllers/AgileDAO';
+import {appgrpDAO} from './controllers/AppGroupDAO';
+import {appDAO} from './controllers/ApplicationDAO';
+import {artifactDAO} from './controllers/ArtifactDAO';
 import {attributeDAO} from './controllers/AttributeDAO';
+import {designationDAO} from './controllers/DesignationDAO';
+import {divisionDAO} from './controllers/DivisionDAO';
+import {employeeDAO} from './controllers/EmployeeDAO';
+import {orgDAO} from './controllers/OrgDAO';
+import {phaseDAO} from './controllers/PhaseDAO';
+import {projectDAO} from './controllers/ProjectDAO';
+import {releaseDAO} from './controllers/ReleaseDAO';
+import {reqtypeDAO} from './controllers/RequirementTypeDAO';
+import {roleDAO} from './controllers/RoleDAO';
+import {statusDAO} from './controllers/StatusDAO';
+import {timezoneDAO} from './controllers/TimezoneDAO';
+import {vendorDAO} from './controllers/VendorDAO';
 
 const app = express();
-
-// Old files implementation
-let router = express.Router();
-attributeDAO(router);
-/************ Old implementation end *************/
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -54,6 +66,28 @@ app.route('/').get(valid, (req, res, next) => {
     next();
   }
 });
+
+// Admin module old files integration
+let router = Router();
+roleDAO(router);
+agileDAO(router);
+appgrpDAO(router);
+appDAO(router);
+artifactDAO(router);
+attributeDAO(router);
+designationDAO(router);
+divisionDAO(router);
+employeeDAO(router);
+orgDAO(router);
+phaseDAO(router);
+projectDAO(router);
+releaseDAO(router);
+reqtypeDAO(router);
+statusDAO(router);
+timezoneDAO(router);
+vendorDAO(router);
+app.use('/admin-settings', router);
+/************ Old implementation end *************/
 
 app.use('/', AuthRouter);
 app.use('/employees', EmployeeRouter);

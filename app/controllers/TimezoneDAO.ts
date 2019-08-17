@@ -32,5 +32,3 @@ function getTimezones(req: any){
 		}
 	})
 }
-
-module.exports = timezoneDAO;

@@ -126,5 +126,3 @@ function verifyUserLogin(req: any){
 		}
 	})
 }
-
-module.exports = employeeDAO;

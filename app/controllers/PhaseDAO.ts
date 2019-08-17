@@ -73,5 +73,3 @@ function getPhases(req: any){
 		}
 	})
 }
-
-module.exports = phaseDAO;
