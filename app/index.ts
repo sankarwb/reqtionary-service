@@ -2,7 +2,9 @@ import express from 'express';
 import { Router } from "express";
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-require('dotenv').config();
+if (process.env.NODE_ENV === 'development') {
+  require('dotenv').config();
+}
 
 import {valid} from './utils/tokenization';
 //import * as reload from 'express-reload';
@@ -50,7 +52,7 @@ app.configure('production', () => {
   app.use(express.errorHandler())
 }) */
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', (process.env.NODE_ENV==='development')?process.env.DEV_ALLOW_ORIGIN:process.env.PROD_ALLOW_ORIGIN);
+  res.header('Access-Control-Allow-Origin', process.env.ALLOW_ORIGIN);
   res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, application/json, Origin, X-Requested-With, Accept, Authorization');
   res.header('Access-Control-Allow-Credentials', 'true');
@@ -131,7 +133,7 @@ app.use((err: any, req: any, res: any, next: any) => {
 
 //app.use(reload(`${__dirname}/dist/server.js`));
 console.log('MySQL User: ',process.env.MYSQL_USER);
-app.listen(process.env.PORT || 3000, () => {
+app.listen(process.env.PORT, () => {
   console.log('App is running at http://localhost:%d in %s mode',
   process.env.PORT, process.env.NODE_ENV);
 });
