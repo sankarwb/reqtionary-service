@@ -1,8 +1,16 @@
 import {forkJoin, Observable} from "rxjs";
+import {mergeMap} from "rxjs/operators";
 import {multiQuery, query, queryAsync} from "../../config/sql.config";
 import {Artifact} from "../models/artifact";
 import { ArtifactAttribute } from "../models/artifact-attribute";
 import { Employee } from "../models/employee";
+
+class PreRequisite {
+    nextCode: string;
+    nextSeqNum: number;
+    nextVersion: number;
+    associations: string;
+}
 
 export const parentArtifacts = (req: {applicationId: number}) => {
   return new Observable<Artifact[]>((observer) => {
@@ -145,76 +153,80 @@ export const artifactAssociations = (artifactId: number) => {
 };
 
 export const actionArtifact = (req: Artifact) => {
-  return new Observable<Artifact>((observer) => {
-    artifactPrerequisites(req).subscribe((prerequisite: {nextCode: string, nextSeqNum: number, nextVersion: number, associations: string}) => {
-      req.version = req.id ? prerequisite.nextVersion : 1;
-      let sql = "",
-          values = [
-            req.orgId,
-            req.projectId,
-            req.applicationId,
-            req.requirementTypeId,
-            req.parentId || 0,
-            req.id ? req.UID : `${prerequisite.nextCode}${prerequisite.nextSeqNum + 1}`,
-            req.version,
-            req.name,
-            req.name,
-            req.description,
-            req.description,
-            req.effectiveDate,
-            req.filePath,
-            req.displaySequence || 1,
-            req.comments,
-            req.user.id,
-            req.status || "New",
-            req.expectedPoints || 0,
-            req.actualPoints || 0,
-            req.active || 1,
-            req.user.id
-          ];
-      if (req.id) {
-        values.splice(5, 1); // Remove UID
-        values.splice(1, 0, req.id); // Add artifact ID
-        sql = `CALL sp_updateArtifact(?,?,?,?,?,?,0,?,?,?,?,?,?,?,?,?,'',?,?,?,?,?,?,@artifactStatus); SELECT @artifactStatus;`;
-      } else {
-        sql = `CALL sp_createNewArtifact(?,?,?,?,?,0,?,?,?,?,?,?,?,?,?,?,'',?,?,?,?,?,?,now(),0,@artifactStatus,@artifactId); SELECT @artifactStatus,@artifactId;`;
-      }
-      multiQuery(sql, values).subscribe((actionArtifactResult: any[]) => {
-        /*const artifactStatus = actionArtifactResult[1][0]["@artifactStatus"],
-            observables: Array<Observable<any>> = [];
-        if (!req.id) {
-          req.id = actionArtifactResult[1][0]["@artifactId"];
-        }
-        // Action Artifact Attributes
-        if (!!req.attributes && req.attributes.length) {
-          const actionAttributes: Array<Observable<any>> = [];
-          req.attributes.forEach((attribute) => {
-            actionAttributes.push(actionArtifactAttribute(req, attribute));
-          });
-          observables.push(forkJoin(actionAttributes));
-        }
-        // Action artifact associations
-        if (!!req.associations && req.associations.length) {
-          observables.push(actionArtifactAssociations(req));
-          observables.push(actionReverseArtifactAssociations(req, prerequisite.associations));
-        }
-        // increment object sequence number
-        observables.push(query(`UPDATE light_object SET seqnum_object=? WHERE id_object=?`, [prerequisite.nextSeqNum + 1, req.requirementTypeId]));
-        forkJoin(observables).subscribe((finalResult) => {
-          observer.next(req);
-          observer.complete();
-        }, (err) => {
-          console.log(err);
-          observer.error(err);
-        }, () => observer.complete());*/
-      }, (err) => {
-        console.log(err);
-        observer.error(err); }, () => observer.complete());
-    }, (err) => {
-      console.log(err);
-      observer.error(err); }, () => observer.complete());
+  return new Observable<Artifact>(observer => {
+    const prerequisites = artifactPrerequisites(req);
+    const action = prerequisites.pipe(mergeMap(preRequisite => {
+      return createUpdateArtifact(preRequisite, req);
+    })).subscribe(response => {
+      observer.next(response);
+    }, (err) => observer.error(err), () => observer.complete());
   });
 };
+
+const createUpdateArtifact = (preRequisite: any, req: Artifact) => {
+  return new Observable<any>(observer => {
+    req.version = req.id ? preRequisite.nextVersion : 1;
+    let sql = "",
+        values = [
+          req.orgId,
+          req.projectId,
+          req.applicationId,
+          req.requirementTypeId,
+          req.parentId || 0,
+          req.id ? req.UID : `${preRequisite.nextCode}${preRequisite.nextSeqNum + 1}`,
+          req.version,
+          req.name,
+          req.name,
+          req.description,
+          req.description,
+          req.effectiveDate,
+          req.filePath,
+          req.displaySequence || 1,
+          req.comments,
+          req.user.id,
+          req.status || "New",
+          req.expectedPoints || 0,
+          req.actualPoints || 0,
+          req.active || 1,
+          req.user.id
+        ];
+    if (req.id) {
+      values.splice(5, 1); // Remove UID
+      values.splice(1, 0, req.id); // Add artifact ID
+      sql = `CALL sp_updateArtifact(?,?,?,?,?,?,0,?,?,?,?,?,?,?,?,?,'',?,?,?,?,?,?,@artifactStatus); SELECT @artifactStatus;`;
+    } else {
+      sql = `CALL sp_createNewArtifact(?,?,?,?,?,0,?,?,?,?,?,?,?,?,?,?,'',?,?,?,?,?,?,now(),0,@artifactStatus,@artifactId); SELECT @artifactStatus,@artifactId;`;
+    }
+    multiQuery(sql, values).pipe(mergeMap((actionArtifactResult: any[]) => {
+      return postActionArtifact(actionArtifactResult, preRequisite, req);
+    }))
+    .subscribe(response => {
+      observer.next(response);
+    }, (err) => observer.error(err), () => observer.complete());
+  });
+}
+
+const postActionArtifact = (actionArtifactResult: any[], preRequisite: PreRequisite, req: Artifact) => {
+  return new Observable<any>(observer => {
+    const artifactStatus = actionArtifactResult[1][0]["@artifactStatus"];
+    let observables: Array<Observable<any>> = [];
+    if (!req.id) {
+      req.id = actionArtifactResult[1][0]["@artifactId"];
+    }
+    if (!!req.attributes && !!req.attributes.length) {
+      observables = req.attributes.map(attribute => actionArtifactAttribute(req, attribute));
+    }
+    if (!!req.associations && req.associations.length) {
+      observables.push(actionArtifactAssociations(req));
+      observables.push(actionReverseArtifactAssociations(req, preRequisite.associations));
+    }
+    // increment object sequence number
+    observables.push(query(`UPDATE light_object SET seqnum_object=? WHERE id_object=?`, [preRequisite.nextSeqNum + 1, req.requirementTypeId]));
+    forkJoin(observables).subscribe(finalResult => {
+      observer.next(finalResult);
+    }, (err) => observer.error(err), () => observer.complete());
+  });
+}
 
 const actionArtifactAttribute = (artifact: Artifact, attribute: ArtifactAttribute) => {
   return new Observable((observer) => {
@@ -239,7 +251,6 @@ const actionArtifactAssociations = (artifact: Artifact) => {
   return new Observable((observer) => {
     const sql = "CALL sp_actionArtifactAssociation(?,?,?,0,0,?,?,now());",
         values = [artifact.orgId, artifact.id, artifact.associations.map((association) => association.id).join(), 0, 0, artifact.version, artifact.modifiedBy];
-
     multiQuery(sql, values).subscribe(
         () => observer.next(true),
         (err) => observer.error(err),
@@ -309,7 +320,7 @@ const actionReverseArtifactAssociations = (artifact: Artifact, currentAssociatio
 */
 
 export const artifactPrerequisites = (req: Artifact) => {
-  return new Observable<any>((observer) => {
+  return new Observable<PreRequisite>(observer => {
     const sql = "CALL sp_getArtifactRequirements(?,?,?,?,@nextCode,@nextSeqNum,@nextVersion,@associations);SELECT @nextCode,@nextSeqNum,@nextVersion,@associations;",
         values = [req.orgId, req.appId, req.id, req.requirementTypeId];
     multiQuery(sql, values).subscribe((rows: any[]) => {
