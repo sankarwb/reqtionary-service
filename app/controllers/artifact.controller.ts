@@ -1,15 +1,23 @@
 import {forkJoin, Observable} from "rxjs";
 import {mergeMap} from "rxjs/operators";
-import {multiQuery, query, queryAsync} from "../../config/sql.config";
+import {multiQuery, query} from "../../config/sql.config";
 import {Artifact} from "../models/artifact";
 import { ArtifactAttribute } from "../models/artifact-attribute";
 import { Employee } from "../models/employee";
+import { ArtifactAssociation, AssociationStatus } from "../models/artifact-association";
 
 class PreRequisite {
     nextCode: string;
     nextSeqNum: number;
     nextVersion: number;
     associations: string;
+
+    constructor(nextCode: string, nextSeqNum: number, nextVersion: number, associations: string) {
+      this.nextCode = nextCode;
+      this.nextSeqNum = nextSeqNum;
+      this.nextVersion = nextVersion;
+      this.associations = associations;
+    }
 }
 
 export const parentArtifacts = (req: {applicationId: number}) => {
@@ -17,20 +25,9 @@ export const parentArtifacts = (req: {applicationId: number}) => {
       const columns = ["id_artifact", "name_artifact"],
             sql = `SELECT ?? FROM light_artifact WHERE id_artifact IN (SELECT parent_id_artifact FROM light_artifact WHERE id_app=?);`;
       query(sql, [columns, req.applicationId]).subscribe((rows: any[]) => {
-      observer.next(processResponse(columns, rows));
+      observer.next(processArtifactResponse(columns, rows));
     }, (err) => observer.error(err), () => observer.complete());
   });
-};
-
-export const parentArtifactsByApplicationAsync = async (req: {applicationId: number}) => {
-      const columns = ["id_artifact", "name_artifact"],
-            sql = `SELECT ?? FROM light_artifact WHERE id_artifact IN (SELECT parent_id_artifact FROM light_artifact WHERE id_app=?);`;
-      try {
-        const rows = await queryAsync(sql, [columns, req.applicationId]);
-        return rows;
-      } catch (err) {
-        throw err;
-      }
 };
 
 export const artifacts = (req: {applicationId: number, projectId: number, requirementTypeId: number, parentArtifactId?: number, assignedTo?: number}, agile?: boolean) => {
@@ -75,8 +72,9 @@ export const artifacts = (req: {applicationId: number, projectId: number, requir
 
 export const artifactById = (req: {artifactId: number}) => {
   return new Observable<Artifact>((observer) => {
-    forkJoin(artifact(req.artifactId), artifactAttributes(req.artifactId)).subscribe((result) => {
-      const artifact: Artifact = result[0];
+    forkJoin<Artifact, ArtifactAttribute[]>(artifact(req.artifactId), artifactAttributes(req.artifactId))
+    .subscribe((result) => {
+      const artifact = result[0];
       artifact.attributes = result[1];
       observer.next(artifact);
     }, (err) => observer.error(err), () => observer.complete());
@@ -103,9 +101,9 @@ const artifact = (artifactId: number) => {
         artifact.name = row.name_artifact;
         artifact.description = row.desc_artifact;
         artifact.effectiveDate = row.effectivedate_artifact;
-        artifact.filePath = row.filepath_artifact;
+        artifact.attachments = JSON.parse(row.filepath_artifact || '[]');
         artifact.displaySequence = row.displayseq_artifact;
-        artifact.comments = row.comments_artifact;
+        artifact.comments = JSON.parse(row.comments_artifact || '[]');
         artifact.status = row.status_artifact;
         artifact.assignedTo = row.assignedto_artifact;
         artifact.expectedPoints = row.expected_points_artifact;
@@ -135,29 +133,55 @@ const artifactAttributes = (artifactId: number) => {
   });
 };
 
-export const artifactAssociations = (artifactId: number) => {
-  return new Observable<Artifact[]>((observer) => {
-    const columns = ["id_artifacts_association", "primary_id_artifact", "secondary_id_artifact"],
-        sql = "SELECT ?? FROM light_artifacts_association WHERE primary_id_artifact=?;";
-    query(sql, [columns, artifactId]).subscribe((rows: any[]) => {
-      let artifact: Artifact, artifacts: Artifact[] = [];
-      rows.forEach((row) => {
-        artifact = new Artifact();
-        artifact.id = row.id_artifact;
-        artifact.name = row.attribute_value;
-        artifacts.push(artifact);
+export const artifactAssociations = (req: {artifactId: number}) => {
+  return new Observable<ArtifactAssociation[]>(observer => {
+    secondaryArtifactIds(req.artifactId)
+    .pipe(mergeMap(artifactIds => associations(artifactIds)))
+    .subscribe(response => {
+      observer.next(response);
+    }, (err) => observer.error(err), () => observer.complete());
+  });
+}
+
+const secondaryArtifactIds = (artifactId: number) => {
+  return new Observable<string>(observer => {
+    query('SELECT ?? FROM light_artifacts_association WHERE primary_id_artifact=?',
+    [['secondary_id_artifact'], artifactId]).subscribe(rows => {
+      observer.next(!!rows.length ? rows[0].secondary_id_artifact: '');
+    }, (err) => observer.error(err), () => observer.complete());
+  });
+}
+
+const associations = (artifactIds: string) => {
+  return new Observable<ArtifactAssociation[]>(observer => {
+    if (!artifactIds) {
+      observer.next([]);
+      observer.complete();
+      return;
+    }
+    const columns = ["id_artifact", "uid_artifact", "name_artifact", "color"],
+        sql = `SELECT ?? FROM light_artifact LA LEFT JOIN light_object LO ON LA.id_object=LO.id_object WHERE id_artifact IN (${artifactIds});`;
+    query(sql, [columns]).subscribe(rows => {
+      let association: ArtifactAssociation, associations: ArtifactAssociation[] = [];
+      rows.forEach(row => {
+        association = new ArtifactAssociation();
+        association.id = row.id_artifact;
+        association.name = row.name_artifact;
+        association.UID = row.uid_artifact;
+        association.color = row.color;
+        association.status = AssociationStatus.SAVED;
+        associations.push(association);
       });
-      observer.next(artifacts);
+      observer.next(associations);
     }, (err) => observer.error(err), () => observer.complete());
   });
 };
 
 export const actionArtifact = (req: Artifact) => {
-  return new Observable<Artifact>(observer => {
-    const prerequisites = artifactPrerequisites(req);
-    const action = prerequisites.pipe(mergeMap(preRequisite => {
-      return createUpdateArtifact(preRequisite, req);
-    })).subscribe(response => {
+  return new Observable<boolean>(observer => {
+    const action = artifactPrerequisites(req)
+    .pipe(mergeMap(preRequisite => createUpdateArtifact(preRequisite, req)))
+    .subscribe(response => {
       observer.next(response);
     }, (err) => observer.error(err), () => observer.complete());
   });
@@ -180,9 +204,9 @@ const createUpdateArtifact = (preRequisite: any, req: Artifact) => {
           req.description,
           req.description,
           req.effectiveDate,
-          req.filePath,
+          JSON.stringify(req.attachments || []),
           req.displaySequence || 1,
-          req.comments,
+          JSON.stringify(req.comments || []),
           req.user.id,
           req.status || "New",
           req.expectedPoints || 0,
@@ -207,7 +231,7 @@ const createUpdateArtifact = (preRequisite: any, req: Artifact) => {
 }
 
 const postActionArtifact = (actionArtifactResult: any[], preRequisite: PreRequisite, req: Artifact) => {
-  return new Observable<any>(observer => {
+  return new Observable<boolean>(observer => {
     const artifactStatus = actionArtifactResult[1][0]["@artifactStatus"];
     let observables: Array<Observable<any>> = [];
     if (!req.id) {
@@ -223,13 +247,13 @@ const postActionArtifact = (actionArtifactResult: any[], preRequisite: PreRequis
     // increment object sequence number
     observables.push(query(`UPDATE light_object SET seqnum_object=? WHERE id_object=?`, [preRequisite.nextSeqNum + 1, req.requirementTypeId]));
     forkJoin(observables).subscribe(finalResult => {
-      observer.next(finalResult);
+      observer.next(true);
     }, (err) => observer.error(err), () => observer.complete());
   });
 }
 
 const actionArtifactAttribute = (artifact: Artifact, attribute: ArtifactAttribute) => {
-  return new Observable((observer) => {
+  return new Observable<boolean>((observer) => {
     let sql = "",
         values = [];
     if (attribute.artifactAttributeId) {
@@ -275,13 +299,13 @@ const actionReverseArtifactAssociations = (artifact: Artifact, currentAssociatio
             const secondaryArtifactIds = rows[0].secondary_id_artifact;
             const split = secondaryArtifactIds.split(",");
             split.splice(split.indexOf(artifact.id), 1);
-            multiQuery("sp_updateReverseArtifactAssociation(?,?)", [id, split.join()]).subscribe();
+            multiQuery("CALL sp_updateReverseArtifactAssociation(?,?)", [id, split.join()]).subscribe();
           });
         } else {
           const association = updatedAssociations.splice(idx, 1)[0];
           observables.push(
             multiQuery(
-              `sp_actionReverseArtifactAssociation(?,?,?,0,0,?,now())`,
+              `CALL sp_actionReverseArtifactAssociation(?,?,?,0,0,?,now())`,
               [artifact.orgId, association.id, artifact.id, artifact.user.id]
             )
           );
@@ -292,7 +316,7 @@ const actionReverseArtifactAssociations = (artifact: Artifact, currentAssociatio
       artifact.associations.forEach((association) => {
         observables.push(
           multiQuery(
-            `sp_actionReverseArtifactAssociation(?,?,?,0,0,?,now())`,
+            `CALL sp_actionReverseArtifactAssociation(?,?,?,0,0,?,now())`,
             [artifact.orgId, association.id, artifact.id, artifact.user.id]
           )
         );
@@ -322,14 +346,14 @@ const actionReverseArtifactAssociations = (artifact: Artifact, currentAssociatio
 export const artifactPrerequisites = (req: Artifact) => {
   return new Observable<PreRequisite>(observer => {
     const sql = "CALL sp_getArtifactRequirements(?,?,?,?,@nextCode,@nextSeqNum,@nextVersion,@associations);SELECT @nextCode,@nextSeqNum,@nextVersion,@associations;",
-        values = [req.orgId, req.appId, req.id, req.requirementTypeId];
+          values = [req.orgId, req.appId, req.id, req.requirementTypeId];
     multiQuery(sql, values).subscribe((rows: any[]) => {
-      observer.next({nextCode: rows[1][0]["@nextCode"], nextSeqNum: rows[1][0]["@nextSeqNum"], nextVersion: rows[1][0]["@nextVersion"], associations: rows[1][0]["@associations"]});
+      observer.next(new PreRequisite(rows[1][0]["@nextCode"], rows[1][0]["@nextSeqNum"], rows[1][0]["@nextVersion"], rows[1][0]["@associations"]));
     }, (err) => observer.error(err), () => observer.complete());
   });
 };
 
-const processResponse = (columns: string[], rows: any[]): Artifact[] => {
+const processArtifactResponse = (columns: string[], rows: any[]): Artifact[] => {
   let artifact: Artifact, artifacts: Artifact[] = [];
   return rows.map((row) => {
     artifact = new Artifact();

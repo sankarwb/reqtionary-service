@@ -1,5 +1,6 @@
 import {createConnection, createPool} from "mysql";
 import {Observable} from "rxjs";
+import { RowData } from "../app/models/row-data";
 
 const pool = createPool({
     connectionLimit: 1000,
@@ -38,8 +39,8 @@ export const multiQuery = (sqlQuery: string, params: any) => {
 @params 		{string} sqlQuery		An sql string
 @params 		{array} params			query parameters ([[columns], params]) eg., [['name','age'],1]
 */
-export const query = (sqlQuery: string, params: any) => {
-	return new Observable((observer) => {
+export const query = (sqlQuery: string, params: Array<Array<string>|number|string>): Observable<RowData[]> => {
+	return new Observable<RowData[]>(observer => {
 		pool.getConnection((err: any, conn: any) => {
 			if (err) {
 				observer.error(err);
@@ -58,26 +59,5 @@ export const query = (sqlQuery: string, params: any) => {
 				console.log(q.sql);
 			}
 		});
-	});
-};
-
-export const queryAsync = async (sqlQuery: string, params: any) => {
-	pool.getConnection((err: any, conn: any) => {
-		if (err) {
-			throw err;
-		} else {
-			const q = conn.query(sqlQuery, params, (err: any, rows: any[]) => {
-				if (err) {
-					console.log(err);
-					throw err;
-				} else {
-					console.log(rows);
-					return rows;
-				}
-				conn.release();
-			});
-			console.log("---------------------------------------------------------------------------------------------------------------------");
-			console.log(q.sql);
-		}
 	});
 };

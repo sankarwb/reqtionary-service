@@ -5,11 +5,11 @@ export class Base {
     get active(): boolean|number {
         return this._active;
     }
-    public id: number;
-    public orgId: number;
-    public name: string;
-    public description: string;
-    public modifiedBy: number;
-    public modifiedDate: string;
+    id: number;
+    orgId: number;
+    name: string;
+    description: string;
+    modifiedBy: number;
+    modifiedDate: string;
     private _active: boolean;
 }

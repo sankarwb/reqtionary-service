@@ -70,7 +70,7 @@ export const historyById = (req: {artifactId: number}) => {
           }
         })
       });
-      observer.next({keyValueMap, artifacts});
+      observer.next({titles: keyValueMap, history: artifacts});
     }, (err) => observer.error(err), () => observer.complete());
   });
 }
