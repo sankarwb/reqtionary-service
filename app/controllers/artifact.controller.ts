@@ -5,6 +5,7 @@ import {Artifact} from "../models/artifact";
 import { ArtifactAttribute } from "../models/artifact-attribute";
 import { Employee } from "../models/employee";
 import { ArtifactAssociation, AssociationStatus } from "../models/artifact-association";
+import { RequirementType } from "../models/requirement-type";
 
 class PreRequisite {
     nextCode: string;
@@ -48,11 +49,12 @@ export const artifacts = (req: {applicationId: number, projectId: number, requir
           if (!artifact || artifact.id !== row.id_artifact) {
             artifact = new Artifact();
             artifact.user = new Employee();
+            artifact.requirementType = new RequirementType();
             artifact.id = row.id_artifact;
             artifact.name = row.name_artifact;
             artifact.UID = row.uid_artifact;
             artifact.status = row.agile_status_value;
-            artifact.color = row.color;
+            artifact.requirementType.color = row.color;
             if (agile) {
               artifact.actualPoints = row.actual_points_artifact;
               artifact.expectedPoints = row.expected_points_artifact;

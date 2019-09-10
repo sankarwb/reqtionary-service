@@ -1,15 +1,13 @@
 From node:12.7.0
 
-RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
-
 WORKDIR /home/node/app
 
 COPY package*.json ./
 
 RUN npm install
 
-COPY --chown=node:node . .
+COPY . .
 
-EXPOSE 3000
+EXPOSE 80
 
 CMD ["npm", "run", "prod"]
